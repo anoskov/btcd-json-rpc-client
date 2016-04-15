@@ -15,7 +15,7 @@
 -export([start_link/0]).
 
 %% Service Functions
--export([getbalance/1]).
+-export([getbalance/1, getbalance/2]).
 
 %% gen_server callbacks
 -export([init/1,
@@ -152,6 +152,10 @@ code_change(_OldVsn, State, _Extra) ->
 -spec(getbalance(pid() ) -> {ok, float()} | {error, term()}).
 getbalance(RpcPid) when is_pid(RpcPid) ->
   gen_server:call(RpcPid, getbalance, ?TIMEOUT).
+
+-spec(getbalance(pid(), binary()) -> {ok, float()} | {error, term()}).
+getbalance(Pid, Account) when is_pid(Pid), is_binary(Account) ->
+  gen_server:call( Pid, {getbalance, [Account]}, ?TIMEOUT).
 
 %%%===================================================================
 %%% Internal Functions
