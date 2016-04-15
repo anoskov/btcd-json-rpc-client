@@ -14,6 +14,9 @@
 %% API
 -export([start_link/0]).
 
+%% Service Functions
+-export([getbalance/1]).
+
 %% gen_server callbacks
 -export([init/1,
   handle_call/3,
@@ -23,7 +26,10 @@
   code_change/3]).
 
 -define(SERVER, ?MODULE).
+-define(TIMEOUT, 30000).
 -define(SEED_BYTES, 16).
+-define(HTTP_REQUEST_TIMEOUT,    30000).
+-define(HTTP_CONNECTION_TIMEOUT, 3000).
 
 -record(btcd_conf, {
   user     = <<"">>          :: binary(),
@@ -95,6 +101,9 @@ init([Config = #btcd_conf{}]) ->
   {noreply, NewState :: #state{}, timeout() | hibernate} |
   {stop, Reason :: term(), Reply :: term(), NewState :: #state{}} |
   {stop, Reason :: term(), NewState :: #state{}}).
+handle_call(Request, _From, State)
+  when is_atom(Request) ->
+    handle_rpc(Request, [], State);
 handle_call(_Request, _From, State) ->
   {reply, ok, State}.
 
@@ -160,5 +169,78 @@ code_change(_OldVsn, State, _Extra) ->
   {ok, State}.
 
 %%%===================================================================
-%%% Internal functions
+%%% Service Functions
 %%%===================================================================
+
+-spec(getbalance(pid() ) -> {ok, float()} | {error, term()}).
+getbalance(Pid) when is_pid(Pid) ->
+  gen_server:call(Pid, getbalance, ?TIMEOUT).
+
+%%%===================================================================
+%%% Internal Functions
+%%%===================================================================
+
+-spec(handle_rpc(Request :: term(), Params :: term(),
+    State :: #state{}) ->
+  {reply, Reply :: term(), NewState :: #state{}}).
+handle_rpc( Request, Params, State = #state{seed = Seed, config = Config}) ->
+  Method = erlang:atom_to_binary(Request, utf8),
+  JsonReq = jsonrpc2_client:create_request(
+    {Method, mochijson2:decode(jsxn:encode(Params)), seed_to_utf8(Seed)}
+  ),
+  {
+    reply,
+    rpc(JsonReq, Config),
+    State#state{seed = increment_seed(Seed)}
+  }.
+
+seed_to_utf8(Seed) when is_binary(Seed) ->
+  base64:encode(Seed).
+
+increment_seed(Bin) when is_binary(Bin) ->
+  crypto:strong_rand_bytes(?SEED_BYTES).
+
+rpc(JsonReq, Config) ->
+  Request = build_rpc_req(JsonReq, Config),
+  HTTPOptions = [
+    {timeout,         ?HTTP_REQUEST_TIMEOUT   },
+    {connect_timeout, ?HTTP_CONNECTION_TIMEOUT},
+    {autoredirect,    true                    }
+  ],
+  Options = [],
+
+  {ok, _Response = {
+    {_HTTPVersion, StatusCode, _StatusText},
+    _RespHeaders, RespBody}
+  } = httpc:request(post, Request, HTTPOptions, Options),
+
+  RespDecoded = jsxn:decode(unicode:characters_to_binary(RespBody)),
+  case StatusCode of
+    OkStatus when (OkStatus >= 200) and (OkStatus =< 299)->
+      {ok, maps:get(<<"result">>, RespDecoded, RespDecoded)};
+    _ ->
+      {error, maps:get(<<"error">>, RespDecoded, RespDecoded)}
+  end.
+
+build_rpc_req(JsonReq, Config) ->
+  Url = unicode:characters_to_list(rpc_url(Config)),
+  Body = iolist_to_binary(mochijson2:encode(JsonReq)),
+  ContentType = "application/json",
+  C = fun unicode:characters_to_list/1,
+  Headers = [
+    {"Authorization",
+        "Basic " ++ base64:encode_to_string(C(Config#btcd_conf.user) ++ ":" ++ C(Config#btcd_conf.password))
+    }
+  ],
+  {Url, Headers, ContentType, Body}.
+
+rpc_url(#btcd_conf{user = _User, password = _Pass, host = Host, port = Port, ssl = Ssl}) ->
+  <<
+    (case Ssl of
+       true -> <<"https">>;
+       false -> <<"http">>
+     end)/binary, <<"://">>/binary,
+    Host/binary, <<":">>/binary,
+    (erlang:integer_to_binary(Port))/binary,
+    <<"/">>/binary
+  >>.
