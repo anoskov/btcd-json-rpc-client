@@ -53,7 +53,11 @@
 -spec(start_link() ->
   {ok, Pid :: pid()} | ignore | {error, Reason :: term()}).
 start_link() ->
-  gen_server:start_link({local, ?SERVER}, ?MODULE, [], []).
+  Config = #btcd_conf{
+    user     = os:getenv("RPC_USER"),
+    password = os:getenv("RPC_PASSWORD")
+  },
+  gen_server:start_link({local, ?SERVER}, ?MODULE, [Config], []).
 
 %%%===================================================================
 %%% gen_server callbacks
