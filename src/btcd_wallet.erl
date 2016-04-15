@@ -23,8 +23,8 @@
   code_change/3]).
 
 -define(SERVER, ?MODULE).
+-define(SEED_BYTES, 16).
 
--record(state, {}).
 -record(btcd_conf, {
   user     = <<"">>          :: binary(),
   password = <<"">>          :: binary(),
@@ -34,6 +34,11 @@
 }).
 
 -type btcd_conf() :: #btcd_conf{}.
+
+-record(state, {
+  config :: btcd_conf(),
+  seed = crypto:strong_rand_bytes(?SEED_BYTES) :: binary()
+}).
 
 %%%===================================================================
 %%% API
