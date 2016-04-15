@@ -12,7 +12,7 @@
 -behaviour(gen_server).
 
 %% API
--export([start_link/0]).
+-export([start_link/0, start_link/1]).
 
 %% gen_server callbacks
 -export([init/1,
@@ -61,6 +61,12 @@ start_link() ->
     password = os:getenv("RPC_PASSWORD")
   },
   gen_server:start_link({local, ?SERVER}, ?MODULE, [Config], []).
+
+-spec(start_link(binary()) ->
+  {ok, Pid :: pid()} | ignore | {error, Reason :: term()}).
+start_link(Url) when is_binary(Url) ->
+  Config = rpc_url(unicode:characters_to_list(Url)),
+  gen_server:start_link({local, ?SERVER}, [Config], []).
 
 %%%===================================================================
 %%% gen_server callbacks
