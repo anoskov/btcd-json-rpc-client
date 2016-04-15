@@ -5,7 +5,10 @@
   {mod, { btcd_app, []}},
   {applications,
    [kernel,
-    stdlib
+    stdlib,
+    mochiweb,
+    jsonrpc2,
+    jsxn
    ]},
   {env,[]},
   {modules, []},
