@@ -17,7 +17,8 @@
 %% Service Functions
 -export([getbalance/1,
   getbalance/2,
-  getaccountaddress/2]).
+  getaccountaddress/2,
+  getwalletinfo/1]).
 
 %% gen_server callbacks
 -export([init/1,
@@ -162,6 +163,10 @@ getbalance(Pid, Account) when is_pid(Pid), is_binary(Account) ->
 -spec(getaccountaddress(pid(), binary()) -> {ok, binary()} | {error, term()}).
 getaccountaddress(Pid, Account) when is_pid(Pid), is_binary(Account) ->
   gen_server:call(Pid, {getaccountaddress, [Account]}, ?TIMEOUT).
+
+-spec(getwalletinfo(pid()) -> {ok, binary()} | {error, term()}).
+getwalletinfo(Pid) when is_pid(Pid) ->
+  gen_server:call(Pid, getwalletinfo, ?TIMEOUT).
 
 %%%===================================================================
 %%% Internal Functions

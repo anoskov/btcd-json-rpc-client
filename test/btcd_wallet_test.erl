@@ -25,8 +25,12 @@ get_balance_test() ->
 
 get_balance_by_account_test() ->
   Pid = whereis(btcd_rpc),
-  ?assertMatch({ok, _Balance, btcd_wallet:getbalance(Pid, <<"13Lnq2r8YG5nqdfy35gCcpYf16msumrJve">>)).
+  ?assertMatch({ok, _Balance}, btcd_wallet:getbalance(Pid, <<"13Lnq2r8YG5nqdfy35gCcpYf16msumrJve">>)).
 
 get_account_address_test() ->
   Pid = whereis(btcd_rpc),
   ?assertMatch({ok, _Address}, btcd_wallet:getaccountaddress(Pid, <<"13Lnq2r8YG5nqdfy35gCcpYf16msumrJve">>)).
+
+get_wallet_info_test() ->
+  Pid = whereis(btcd_rpc),
+  ?assertMatch({ok, _Info}, btcd_wallet:getwalletinfo(Pid)).
