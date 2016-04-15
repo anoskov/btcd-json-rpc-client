@@ -1,0 +1,16 @@
+{application, btcd,
+ [{description, "client for btcd JSON RPC server"},
+  {vsn, "0.1.0"},
+  {registered, []},
+  {mod, { btcd_app, []}},
+  {applications,
+   [kernel,
+    stdlib
+   ]},
+  {env,[]},
+  {modules, []},
+
+  {maintainers, [{"Andrew Noskov", "andrey.noskov@erlanger.me"}]},
+  {licenses, []},
+  {links, []}
+ ]}.
