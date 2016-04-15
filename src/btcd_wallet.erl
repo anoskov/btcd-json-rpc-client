@@ -25,6 +25,15 @@
 -define(SERVER, ?MODULE).
 
 -record(state, {}).
+-record(btcd_conf, {
+  user     = <<"">>          :: binary(),
+  password = <<"">>          :: binary(),
+  host     = <<"127.0.0.1">> :: binary(),
+  port     = 8332            :: pos_integer(),
+  ssl      = false           :: boolean()
+}).
+
+-type btcd_conf() :: #btcd_conf{}.
 
 %%%===================================================================
 %%% API
