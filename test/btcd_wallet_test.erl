@@ -11,10 +11,14 @@
 
 -include_lib("eunit/include/eunit.hrl").
 
-start_service_test() ->
+start_rpc_service_test() ->
+  Res = btcd_rpc:start_link(),
+  ?assertMatch({ok, _Pid}, Res).
+
+start_wallet_service_test() ->
   Res = btcd_wallet:start_link(),
   ?assertMatch({ok, _Pid}, Res).
 
 get_balance_test() ->
-  Pid = whereis(btcd_wallet),
+  Pid = whereis(btcd_rpc),
   ?assertMatch({ok, Balance}, btcd_wallet:getbalance(Pid)).
