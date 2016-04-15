@@ -77,8 +77,8 @@ start_link() ->
 -spec(init(Args :: term()) ->
   {ok, State :: #state{}} | {ok, State :: #state{}, timeout() | hibernate} |
   {stop, Reason :: term()} | ignore).
-init([]) ->
-  {ok, #state{}}.
+init([Config = #btcd_conf{}]) ->
+  {ok, #state{config = Config}}.
 
 %%--------------------------------------------------------------------
 %% @private
