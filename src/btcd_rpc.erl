@@ -66,7 +66,7 @@ start_link() ->
   {ok, Pid :: pid()} | ignore | {error, Reason :: term()}).
 start_link(Url) when is_binary(Url) ->
   Config = rpc_url(unicode:characters_to_list(Url)),
-  gen_server:start_link({local, ?SERVER}, [Config], []).
+  gen_server:start_link({local, ?SERVER}, ?MODULE, [Config], []).
 
 %%%===================================================================
 %%% gen_server callbacks
