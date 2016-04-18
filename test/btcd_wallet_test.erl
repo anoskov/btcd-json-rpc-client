@@ -38,3 +38,7 @@ get_wallet_info_test() ->
 get_new_address_test() ->
   Pid = whereis(btcd_rpc),
   ?assertMatch({ok, _Address}, btcd_wallet:getnewaddress(Pid)).
+
+get_wallet_lock_test() ->
+  Pid = whereis(btcd_rpc),
+  ?assertMatch({ok, _Res}, btcd_wallet:walletlock(Pid)).
