@@ -29,7 +29,8 @@
   terminate/2,
   code_change/3,
   walletlock/1,
-  walletpassphrase/3]).
+  walletpassphrase/3,
+  walletpassphrasechange/3]).
 
 -define(SERVER, ?MODULE).
 -define(TIMEOUT, 30000).
@@ -186,6 +187,13 @@ walletpassphrase(Pid, PassPhrase, Timeout)
   is_integer(Timeout),
   Timeout >= 0 ->
   gen_server:call(Pid, {walletpassphrase, [PassPhrase, Timeout]}, ?TIMEOUT).
+
+-spec(walletpassphrasechange(pid(), binary(), binary()) -> {ok, term()} | {error, term()}).
+walletpassphrasechange(Pid, OldPassPhrase, NewPassPhrase)
+  when is_pid(Pid),
+  is_binary(OldPassPhrase),
+  is_binary(NewPassPhrase) ->
+  gen_server:call(Pid, {walletpassphrasechange, [OldPassPhrase, NewPassPhrase]}, ?TIMEOUT).
 
 %%%===================================================================
 %%% Internal Functions

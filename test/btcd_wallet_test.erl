@@ -47,3 +47,9 @@ store_wallet_passphrase_test() ->
   Pid = whereis(btcd_rpc),
   PassPhrase = <<"Secret">>,
   ?assertMatch({ok, _Res}, btcd_wallet:walletpassphrase(Pid, PassPhrase, 0)).
+
+change_wallet_passphrase_test() ->
+  Pid = whereis(btcd_rpc),
+  OldPassPhrase = <<"Secret">>,
+  NewPassPhrase = <<"NewSecret">>,
+  ?assertMatch({ok, _Res}, btcd_wallet:walletpassphrasechange(Pid, OldPassPhrase, NewPassPhrase)).
