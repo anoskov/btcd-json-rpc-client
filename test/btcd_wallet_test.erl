@@ -42,3 +42,8 @@ get_new_address_test() ->
 get_wallet_lock_test() ->
   Pid = whereis(btcd_rpc),
   ?assertMatch({ok, _Res}, btcd_wallet:walletlock(Pid)).
+
+store_wallet_passphrase_test() ->
+  Pid = whereis(btcd_rpc),
+  PassPhrase = <<"Secret">>,
+  ?assertMatch({ok, _Res}, btcd_wallet:walletpassphrase(Pid, PassPhrase, 0)).

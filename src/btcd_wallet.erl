@@ -28,7 +28,8 @@
   handle_info/2,
   terminate/2,
   code_change/3,
-  walletlock/1]).
+  walletlock/1,
+  walletpassphrase/3]).
 
 -define(SERVER, ?MODULE).
 -define(TIMEOUT, 30000).
@@ -177,6 +178,14 @@ getnewaddress(Pid) when is_pid(Pid) ->
 -spec(walletlock(pid()) -> {ok, term()} | {error, term()}).
 walletlock(Pid) when is_pid(Pid) ->
   gen_server:call(Pid, walletlock, ?TIMEOUT).
+
+-spec(walletpassphrase(pid(), binary(), non_neg_integer()) -> {ok, term()} | {error, term()}).
+walletpassphrase(Pid, PassPhrase, Timeout)
+  when is_pid(Pid),
+  is_binary(PassPhrase),
+  is_integer(Timeout),
+  Timeout >= 0 ->
+  gen_server:call(Pid, {walletpassphrase, [PassPhrase, Timeout]}, ?TIMEOUT).
 
 %%%===================================================================
 %%% Internal Functions
