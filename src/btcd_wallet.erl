@@ -19,7 +19,10 @@
   getbalance/2,
   getaccountaddress/2,
   getwalletinfo/1,
-  getnewaddress/1]).
+  getnewaddress/1,
+  walletlock/1,
+  walletpassphrase/3,
+  walletpassphrasechange/3]).
 
 %% gen_server callbacks
 -export([init/1,
@@ -27,10 +30,7 @@
   handle_cast/2,
   handle_info/2,
   terminate/2,
-  code_change/3,
-  walletlock/1,
-  walletpassphrase/3,
-  walletpassphrasechange/3]).
+  code_change/3]).
 
 -define(SERVER, ?MODULE).
 -define(TIMEOUT, 30000).
