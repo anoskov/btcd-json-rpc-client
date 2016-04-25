@@ -15,7 +15,8 @@
 -export([start_link/0]).
 
 %% Service Functions
--export([getbalance/1,
+-export([dumpprivkey/2,
+  getbalance/1,
   getbalance/2,
   getaccountaddress/2,
   getwalletinfo/1,
@@ -155,6 +156,12 @@ code_change(_OldVsn, State, _Extra) ->
 %%%===================================================================
 %%% Service Functions
 %%%===================================================================
+
+-spec(dumpprivkey(pid(), binary()) -> {ok, binary()} | {error, term()} ).
+dumpprivkey( Pid, WalletAddress )
+  when is_pid(Pid),
+  is_binary(WalletAddress) ->
+  gen_server:call(Pid, {dumpprivkey, [WalletAddress]}, ?TIMEOUT).
 
 -spec(getbalance(pid() ) -> {ok, float()} | {error, term()}).
 getbalance(Pid) when is_pid(Pid) ->
